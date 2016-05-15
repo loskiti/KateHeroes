@@ -3,36 +3,29 @@ package com.example.kate.test4;
 import android.content.Context;
 import android.graphics.Canvas;
 
-public class GameManager extends Thread
-{
-    /**отрисовка 10 кадров в сек**/
+public class GameManager extends Thread {
+    /**
+     * отрисовка 10 кадров в сек
+     **/
     static final long FPS = 10;
-
-    /**Объект класса GameView*/
     private GameView view;
-
-
-    /**Задаем состояние потока*/
     private boolean running = false;
 
-    /**Конструктор класса*/
-    public GameManager(GameView view)
-    {
+    public GameManager(GameView view) {
         this.view = view;
 
     }
 
-    /**Задание состояния потока*/
-    public void setRunning(boolean run)
-    {
+    public void setRunning(boolean run) {
         running = run;
     }
 
-    /** Действия, выполняемые в потоке */
+    /**
+     * Действия, выполняемые в потоке
+     */
 
     @Override
-    public void run()
-    {
+    public void run() {
         long ticksPS = 1000 / FPS;
         long startTime;
         long sleepTime;
@@ -50,13 +43,14 @@ public class GameManager extends Thread
                     view.getHolder().unlockCanvasAndPost(c);
                 }
             }
-            sleepTime = ticksPS-(System.currentTimeMillis() - startTime);
+            sleepTime = ticksPS - (System.currentTimeMillis() - startTime);
             try {
                 if (sleepTime > 0)
                     sleep(sleepTime);
                 else
                     sleep(10);
-            } catch (Exception e) {}
+            } catch (Exception e) {
+            }
         }
     }
 }

@@ -1,7 +1,5 @@
 package com.example.kate.test4;
-/**
- * point of the way
- */
+//точка пути
 
 final public class WayPoint {
     private int x, y, px, py, cost;

@@ -1,13 +1,10 @@
 package com.example.kate.test4;
 
-import android.content.Context;
-import android.content.res.Resources;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.Rect;
 
-import java.io.InputStream;
+import android.graphics.Bitmap;
+
+import android.graphics.Canvas;
+
 import java.nio.channels.DatagramChannel;
 
 
@@ -21,14 +18,9 @@ public class Tile {
      * Колонок в спрайте = 3
      */
     private static final int BMP_COLUMNS = 3;
-    /**
-     * /**
-     * Картинка
-     */
     private Bitmap bmp;
     private int x;
     private int y;
-    private DatagramChannel assetManager;
 
     public Tile(GameView gameView, Bitmap bmp, int x, int y) {
 
@@ -37,7 +29,7 @@ public class Tile {
         this.bmp = bmp;
         this.width = bmp.getWidth();
         this.height = bmp.getHeight();
-        this.x = x; // на размер картинки!!!!!!!!
+        this.x = x;
         this.y = y;
 
     }
@@ -49,15 +41,15 @@ public class Tile {
 
 
     public void onDraw(Canvas canvas) {
-       // int h = 70;
-        int h=height;
+        int h = height;
         int w = width;
-        int i=x * w - ((y % 2 == 1) ? w / 2 : 0);
-        int j=y * (h / 2 )-h/2;
-        canvas.drawBitmap(bmp, x * w - ((y % 2 == 1) ? w / 2 : 0), y * (h / 2 )-h/2, null);
+        int i = x * w - ((y % 2 == 1) ? w / 2 : 0);
+        int j = y * (h / 2) - h / 2;
+        canvas.drawBitmap(bmp, x * w - ((y % 2 == 1) ? w / 2 : 0), y * (h / 2) - h / 2, null);
     }
-    public void changeWayPoint(Bitmap bmp){
-   this.bmp=bmp;
+
+    public void changeWayPoint(Bitmap bmp) {
+        this.bmp = bmp;
     }
 
 }
