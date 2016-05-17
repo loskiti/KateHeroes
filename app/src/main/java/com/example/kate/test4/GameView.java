@@ -30,6 +30,7 @@ public class GameView extends SurfaceView {
     private int whoGo = 0;
     private int whoDefence;
     private Map map;
+    private boolean ATTACK = false;
     //ограничение по кол-ву кликов
     private long lastClick;
     //ограничение по времени работы алгоритма
@@ -37,7 +38,7 @@ public class GameView extends SurfaceView {
     //для фитнесс-функции: (х,у) координаты игроков и ботов
     private double[] xForAlg;
     private double[] yForAlg;
-    private int numberDraw=-1;
+    private int numberDraw = -1;
     private boolean isBot = false;
     private boolean playerIsAttack = false;
     private int playerWhoDefence = -1;
@@ -95,16 +96,16 @@ public class GameView extends SurfaceView {
     private void createSprites() {
 
 
-        spritesBot.add(createSprite(R.drawable.bad6, 9, 2, 5, 3, 1, 2, 6, 3, 12, 20, 10, true, true));
-        spritesBot.add(createSprite(R.drawable.bad9, 9, 4, 3, 5, 1, 2, 20, 3, 10, 14, 11, true, false));
-        spritesBot.add(createSprite(R.drawable.bad8, 9, 6, 6, 6, 5, 7, 24, 2, 7, 9, 7, true, false));
-        spritesBot.add(createSprite(R.drawable.bad10, 9, 8, 12, 9, 7, 7, 29, 2, 10, 5, 5, true, true));
-        spritesBot.add(createSprite(R.drawable.bad11, 9, 10, 14, 14, 14, 19, 45, 3, 12, 3, 3, true, false));
-        spritesBot.add(createSprite(R.drawable.bad12, 9, 12, 27, 20, 25, 35, 135, 3, 8, 2, 2, true, false));
+        spritesBot.add(createSprite(R.drawable.bad6, 9, 2, 5, 3, 2, 4, 6, 3, 12, 20, 10, true, true));
+        spritesBot.add(createSprite(R.drawable.bad9, 9, 4, 3, 5, 3, 5, 20, 4, 10, 14, 5, true, false));
+        spritesBot.add(createSprite(R.drawable.bad8, 9, 6, 6, 6, 5, 7, 24, 3, 7, 9, 1, true, false));
+        spritesBot.add(createSprite(R.drawable.bad10, 9, 8, 12, 9, 7, 7, 29, 2, 10, 5, 1, true, true));
+        spritesBot.add(createSprite(R.drawable.bad11, 9, 10, 14, 14, 14, 19, 45, 3, 12, 3, 1, true, false));
+        spritesBot.add(createSprite(R.drawable.bad12, 9, 12, 27, 20, 25, 35, 135, 3, 8, 2, 1, true, false));
 
 
         spritesPlayer.add(createSprite(R.drawable.bad1, 1, 2, 3, 3, 1, 4, 6, 2, 13, 16, 12, false, false));
-        spritesPlayer.add(createSprite(R.drawable.bad2, 1, 4, 3, 4, 1, 4, 13, 2, 8, 15, 20, false, false));
+        spritesPlayer.add(createSprite(R.drawable.bad2, 1, 4, 3, 4, 1, 4, 13, 3, 8, 15, 20, false, false));
         spritesPlayer.add(createSprite(R.drawable.bad3, 1, 6, 4, 2, 4, 6, 15, 3, 13, 8, 12, false, false));
         spritesPlayer.add(createSprite(R.drawable.bad4, 1, 8, 6, 6, 6, 13, 32, 1, 9, 5, 6, false, true));
         spritesPlayer.add(createSprite(R.drawable.bad5, 1, 10, 18, 17, 10, 17, 66, 2, 15, 3, 2, false, false));
@@ -116,7 +117,7 @@ public class GameView extends SurfaceView {
     private Sprite createSprite(int resource, int x, int y, int damage,
                                 int defence, int minAttack, int maxAttack, int health, int step, int initiative, int morale, int number, boolean isBot, boolean shot) {
         Bitmap bmp = BitmapFactory.decodeResource(getResources(), resource);
-        return new Sprite( bmp, x, y, damage, defence, minAttack, maxAttack, health, step, initiative, morale, number, isBot, shot, false);
+        return new Sprite(bmp, x, y, damage, defence, minAttack, maxAttack, health, step, initiative, morale, number, isBot, shot, false);
     }
 
     private Tile createTile(int resouce, int x, int y) {
@@ -193,6 +194,7 @@ public class GameView extends SurfaceView {
     protected void onDraw(Canvas canvas) {
         canvas.drawColor(Color.BLACK);
         if (!FINISH) {
+
             if (USE_STEP) {
                 for (Tile tile : tiles) {
                     Bitmap bmp = BitmapFactory.decodeResource(getResources(), R.drawable.pis);
@@ -225,17 +227,18 @@ public class GameView extends SurfaceView {
             //меню
             Bitmap bmp1 = BitmapFactory.decodeResource(getResources(), R.drawable.menu2);
             canvas.drawBitmap(bmp1, canvas.getWidth() - bmp1.getWidth(), canvas.getHeight() - bmp1.getHeight(), null);
+
         }
         if (FINISH) {
-            if (spritesBot.size() == 0) {
+            if (isFinish() == 0) {
                 Bitmap bmp2 = BitmapFactory.decodeResource(getResources(), R.drawable.menu4);
                 canvas.drawBitmap(bmp2, 500, 700, null);
-
+                gameLoopThread.setRunning(false);
 
             } else {
                 Bitmap bmp2 = BitmapFactory.decodeResource(getResources(), R.drawable.menu3);
                 canvas.drawBitmap(bmp2, 0, 0, null);
-
+                gameLoopThread.setRunning(false);
 
             }
         }
@@ -276,7 +279,6 @@ public class GameView extends SurfaceView {
                         playerIsAttack = true;
                         playerWhoDefence = i;
                         whoDefence = i;
-                       // numberDraw=i;
 
                     }
                 }
@@ -294,9 +296,7 @@ public class GameView extends SurfaceView {
                             Toast toast = Toast.makeText(getContext(), "Будет убито " + Integer.toString((int)
                                     att / spritesBot.get(playerWhoDefence).getHealth())
                                     , Toast.LENGTH_SHORT);
-                            //toast.setGravity(Gravity.NO_GRAVITY, -i*120, -j);
                             toast.show();
-                            // Log.d("TEST", Thread.currentThread().getName());
                         }
                     });
                 }
@@ -306,7 +306,7 @@ public class GameView extends SurfaceView {
                     if (isoX == (int) spritesPlayer.get(i).getX() && isoY == (int) spritesPlayer.get(i).getY()) {
                         isAttack = 1;
                         whoDefence = i;
-                      //  numberDraw=i+spritesBot.size();
+
                     }
                 }
                 if (isAttack == 1)
@@ -317,28 +317,15 @@ public class GameView extends SurfaceView {
             // просто ход
             if (isAttack == 0)
                 if (tileIsPossible(isoX, isoY)) {
+                    numberDraw = -1;
                     whoGo = isWhoGo();
                     double x, y;
-                    //   if (isWhoPlay() == 0) {
                     x = spritesPlayer.get(whoGo).getX();
                     y = spritesPlayer.get(whoGo).getY();
-                    //  }/* else {
-                    //   x = spritesBot.get(whoGo).getX();
-                    //  y = spritesBot.get(whoGo).getY();
-                    //   }
-                    //если удар, то отходим на шаг назад
-                  /*  if (isAttack == 1)
-                        isoX = isoX + ((isoX - (int) x > 0) ? -1 : 1);*/
-
                     MapWay mapPath = makePath((int) x, (int) y, isoX, isoY);
-                    // if (isWhoPlay() == 0)
                     spritesPlayer.get(whoGo).mapway = mapPath;
-                    // else
-                    //   spritesBot.get(whoGo).mapway = mapPath;
                     playerIsAttack = false;
                     playerWhoDefence = -1;
-                    //  if (isAttack == 1)
-                    //  doAttack(shot);
                     this.post(new Runnable() {
                         @Override
                         public void run() {
@@ -355,7 +342,8 @@ public class GameView extends SurfaceView {
 
         return true;
     }
-//удар
+
+    //удар
     protected void doAttack(int shot) {
         int damage;
         final int outlive;
@@ -378,16 +366,23 @@ public class GameView extends SurfaceView {
             if (outlive < 1) {
                 delitInOrder(0);
                 spritesBot.get(whoDefence).setDead(true);
-                roundPlayer.get(whoDefence + 6).setDead();
-                this.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        Toast toast = Toast.makeText(getContext(), "Один из противников умер"
-                                , Toast.LENGTH_SHORT);
-                        toast.show();
+                int flagRound = 0;
+                for (int i = 0; i < roundPlayer.size(); i++) {
+                    if (roundPlayer.get(i).getSizeInList() < 6)
+                        flagRound++;
+                }
+                roundPlayer.get(whoDefence + flagRound).setDead();
+                isFinish();
+                if (!FINISH)
+                    this.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast toast = Toast.makeText(getContext(), "Один из противников умер"
+                                    , Toast.LENGTH_SHORT);
+                            toast.show();
 
-                    }
-                });
+                        }
+                    });
 
             }
 
@@ -409,30 +404,33 @@ public class GameView extends SurfaceView {
                 delitInOrder(6);
                 spritesPlayer.get(whoDefence).setDead(true);
                 roundPlayer.get(whoDefence).setDead();
-                this.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        Toast toast = Toast.makeText(getContext(), "Один из ваших персонажей умер"
-                                , Toast.LENGTH_SHORT);
-                        toast.show();
-                    }
-                });
+                isFinish();
+                if (!FINISH)
+                    this.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast toast = Toast.makeText(getContext(), "Один из ваших персонажей умер"
+                                    , Toast.LENGTH_SHORT);
+                            toast.show();
+                        }
+                    });
+
 
             }
         }
-        if (spritesBot.size() == 0 || spritesPlayer.size() == 0)
-            FINISH = true;
 
 
     }
-// какой перонаж из фракции ходит
+
+    // какой перонаж из фракции ходит
     private int isWhoGo() {
 
         int flag = showRoundPlayer.get(0).getSizeInList();
         flag = flag - ((flag - 6 < 0) ? 0 : 6);
         return flag;
     }
-//ходит бот или игрок
+
+    //ходит бот или игрок
     private int isWhoPlay() {
 
         int flag = showRoundPlayer.get(0).getSizeInList();
@@ -447,7 +445,8 @@ public class GameView extends SurfaceView {
         else
             return 0;
     }
-//хождение
+
+    //хождение
     public MapWay makePath(int startX, int startY, int endX, int endY) {
         MapWayFind mfp = new MapWayFind();
         mfp.setcheckPoint(new IMapCheckPoint() {
@@ -477,7 +476,8 @@ public class GameView extends SurfaceView {
 
         return null;
     }
-//возможно ли сделать шаг
+
+    //возможно ли сделать шаг
     public boolean possibleMove(int x, int y) {
         for (Sprite sprite : spritesBot) {
             if (sprite.getX() == x && sprite.getY() == y && !sprite.getDead())
@@ -493,9 +493,10 @@ public class GameView extends SurfaceView {
 
     public boolean tileIsPossible(int x, int y) {
 
-        return (map.getTile(x, y) == 1 && x < 10 && x > 0 && y < 16 && possibleMove(x, y));
+        return (map.getTile(x, y) == 1 && x < 10 && x > 0 && y < 16 && y > 0 && possibleMove(x, y));
     }
-//обновить АТВ-шкалу
+
+    //обновить АТВ-шкалу
     private void doOrder() {
 
         int flag = 0;
@@ -564,7 +565,8 @@ public class GameView extends SurfaceView {
                 }
             }
     }
-//удаление персонажа, если он умер
+
+    //удаление персонажа, если он умер
     private void delitInOrder(int flag) {
         // первые 6-боты, с 6 по 12 - игрок
         for (int i = 1; i < showRoundPlayer.size(); i++) {
@@ -580,12 +582,15 @@ public class GameView extends SurfaceView {
         }
     }
 
-//слеующий ход-расчет АТВ-шкалы
+    //слеующий ход-расчет АТВ-шкалы
     class MyTimerTask extends TimerTask {
 
         @Override
         public void run() {
-
+            if (ATTACK) {
+                doAttack(0 + ((isShot() == true) ? 1 : 0));
+            }
+            ATTACK = false;
             if (FIRST_ROUND_BOT) {
                 doAlg();
                 FIRST_ROUND_BOT = false;
@@ -631,20 +636,24 @@ public class GameView extends SurfaceView {
             if (isShot() == true) {
 
                 for (int i = 0; i < spritesBot.size(); i++) {
-                    if (isoX == (int) spritesBot.get(i).getX() && isoY == (int) spritesBot.get(i).getY() && !spritesBot.get(i).getDead())
-                        numberDraw=i;
+                    if (isoX == (int) spritesBot.get(i).getX() && isoY == (int) spritesBot.get(i).getY() && !spritesBot.get(i).getDead()) {
+                        numberDraw = i;
                         return true;
+                    }
+
                 }
+                for (int i = 0; i < spritesPlayer.size(); i++) {
+                    if (isoX == (int) spritesPlayer.get(i).getX() && isoY == (int) spritesPlayer.get(i).getY() && !spritesPlayer.get(i).getDead()) {
+                        numberDraw = i;
+                        return false;
+                    }
+                }
+                return false;
             }
 
-            for (int i = 0; i < spritesBot.size(); i++) {
-                if (isoX == (int) spritesBot.get(i).getX() && isoY == (int) spritesBot.get(i).getY()&& !spritesBot.get(i).getDead()) {
-                    numberDraw = i;
-                    return false;
-                }
-            }
+
             for (int i = 0; i < spritesPlayer.size(); i++) {
-                if (isoX == (int) spritesPlayer.get(i).getX() && isoY == (int) spritesPlayer.get(i).getY()&& !spritesPlayer.get(i).getDead()) {
+                if (isoX == (int) spritesPlayer.get(i).getX() && isoY == (int) spritesPlayer.get(i).getY() && !spritesPlayer.get(i).getDead()) {
                     numberDraw = i + spritesBot.size();
                     return false;
                 }
@@ -652,86 +661,105 @@ public class GameView extends SurfaceView {
             if (spritesPlayer.get(isWhoGo()).getX() + spritesPlayer.get(isWhoGo()).getStep() > isoX && spritesPlayer.get(isWhoGo()).getX() - spritesPlayer.get(isWhoGo()).getStep() < isoX && isoX < 16 &&
                     spritesPlayer.get(isWhoGo()).getY() + spritesPlayer.get(isWhoGo()).getStep() > isoY && spritesPlayer.get(isWhoGo()).getY() - spritesPlayer.get(isWhoGo()).getStep() < isoY)
                 return true;
-            else return false;
-        } else if (spritesBot.get(isWhoGo()).getX() + spritesBot.get(isWhoGo()).getStep() > isoX && spritesBot.get(isWhoGo()).getX() - spritesBot.get(isWhoGo()).getStep() < isoX && isoX < 16 &&
-                spritesBot.get(isWhoGo()).getY() + spritesBot.get(isWhoGo()).getStep() > isoY && spritesBot.get(isWhoGo()).getY() - spritesBot.get(isWhoGo()).getStep() < isoY)
-            return true;
-        else return false;
 
+            for (int i = 0; i < spritesBot.size(); i++) {
+                if (isoX == (int) spritesBot.get(i).getX() && isoY == (int) spritesBot.get(i).getY() && !spritesBot.get(i).getDead()) {
+                    numberDraw = i;
+                    return false;
+                }
+            }
+            return false;
+        } else {
+
+
+            if (spritesBot.get(isWhoGo()).getX() + spritesBot.get(isWhoGo()).getStep() > isoX && spritesBot.get(isWhoGo()).getX() - spritesBot.get(isWhoGo()).getStep() < isoX && isoX < 16 &&
+                    spritesBot.get(isWhoGo()).getY() + spritesBot.get(isWhoGo()).getStep() > isoY && spritesBot.get(isWhoGo()).getY() - spritesBot.get(isWhoGo()).getStep() < isoY)
+                return true;
+            else
+                return false;
+        }
 
     }
-//меню
+
+    //меню
     private boolean isButton(int x, int y) {
         if (x > 934 && y > 548) {
             //правая часть
             if (x > 1122) {
                 if (y > 681) {
                     //количество персонажей
+                    playerIsAttack = false;
+                    playerWhoDefence = -1;
                     final int flag;
-                    if (numberDraw < spritesBot.size() && numberDraw>-1) {
-                         flag=spritesBot.get(numberDraw).getNumber();
+                    if (numberDraw > -1) {
+                        if (numberDraw < spritesBot.size()) {
+                            flag = spritesBot.get(numberDraw).getNumber();
 
-                    } else {
-                        flag=spritesPlayer.get(numberDraw-spritesBot.size()).getNumber();
-                    }
-                    this.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            Toast toast = Toast.makeText(getContext(), "Персонажей"+Integer.toString(flag)
-                                    , Toast.LENGTH_SHORT);
-                            toast.show();
+                        } else {
+                            flag = spritesPlayer.get(numberDraw - spritesBot.size()).getNumber();
                         }
-                    });
+                        this.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast toast = Toast.makeText(getContext(), "Персонажей " + Integer.toString(flag)
+                                        , Toast.LENGTH_SHORT);
+                                toast.show();
+                            }
+                        });
+                    }
                 }
                 if (y < 645) {
                     // удар
-                    numberDraw=-1;
-                    if (!isBot) return false;
-                    int isoX = (int) spritesBot.get(playerWhoDefence).getX();
-                    int isoY = (int) spritesBot.get(playerWhoDefence).getY();
-                    // просто ход или, если ближний бой, то подойти к сопернику
-                    if (playerIsAttack == true && !isShot()) {
+                    numberDraw = -1;
 
-                        whoGo = isWhoGo();
-                        double X, Y;
-                        X = spritesPlayer.get(whoGo).getX();
-                        Y = spritesPlayer.get(whoGo).getY();
-                        //если удар, то отходим на шаг назад
-                        isoX = isoX - 1;
-                        MapWay mapPath = makePath((int) X, (int) Y, isoX, isoY);
-                        spritesPlayer.get(whoGo).mapway = mapPath;
-                        doAttack(0 + ((isShot() == true) ? 1 : 0));
-                        playerIsAttack = false;
-                        playerWhoDefence = -1;
-                        this.post(new Runnable() {
-                            @Override
-                            public void run() {
-                                Timer mTimer = new Timer();
-                                MyTimerTask myTimerTask = new MyTimerTask();
-                                mTimer.schedule(myTimerTask, 5 * 100 * 5);
-                            }
-                        });
+                    if (playerIsAttack) {
+                        int isoX = (int) spritesBot.get(playerWhoDefence).getX();
+                        int isoY = (int) spritesBot.get(playerWhoDefence).getY();
+                        // просто ход или, если ближний бой, то подойти к сопернику
+                        if (playerIsAttack == true && !isShot()) {
 
-                    }
+                            whoGo = isWhoGo();
+                            double X, Y;
+                            X = spritesPlayer.get(whoGo).getX();
+                            Y = spritesPlayer.get(whoGo).getY();
+                            //если удар, то отходим на шаг назад
+                            isoX = isoX - 1;
+                            MapWay mapPath = makePath((int) X, (int) Y, isoX, isoY);
+                            spritesPlayer.get(whoGo).mapway = mapPath;
+                            //doAttack(0 + ((isShot() == true) ? 1 : 0));
+                            ATTACK = true;
+                            playerIsAttack = false;
+                            playerWhoDefence = -1;
+                            this.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Timer mTimer = new Timer();
+                                    MyTimerTask myTimerTask = new MyTimerTask();
+                                    mTimer.schedule(myTimerTask, 5 * 100 * 5);
+                                }
+                            });
 
-                    // если выстрел
-                    if (playerIsAttack == true && isShot()) {
-                        Bitmap bmp = BitmapFactory.decodeResource(getResources(), R.drawable.f);
-                        tiles.get((int) spritesBot.get(playerWhoDefence).getY() * 12 + (int) spritesBot.get(playerWhoDefence).getX()).changeWayPoint(bmp);
+                        }
 
-                        spritesEffect.add(createEffect(R.drawable.fire, (int) spritesBot.get(playerWhoDefence).getX(), (int) spritesBot.get(playerWhoDefence).getY()));
-                        doAttack(0 + ((isShot() == true) ? 1 : 0));
-                        playerIsAttack = false;
-                        playerWhoDefence = -1;
-                        this.post(new Runnable() {
-                            @Override
-                            public void run() {
-                                Timer mTimer = new Timer();
-                                MyTimerTask myTimerTask = new MyTimerTask();
-                                mTimer.schedule(myTimerTask, 100 * 4);
-                            }
-                        });
+                        // если выстрел
+                        if (playerIsAttack == true && isShot()) {
+                            Bitmap bmp = BitmapFactory.decodeResource(getResources(), R.drawable.f);
+                            tiles.get((int) spritesBot.get(playerWhoDefence).getY() * 12 + (int) spritesBot.get(playerWhoDefence).getX()).changeWayPoint(bmp);
 
+                            spritesEffect.add(createEffect(R.drawable.fire, (int) spritesBot.get(playerWhoDefence).getX(), (int) spritesBot.get(playerWhoDefence).getY()));
+                            doAttack(0 + ((isShot() == true) ? 1 : 0));
+                            playerIsAttack = false;
+                            playerWhoDefence = -1;
+                            this.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Timer mTimer = new Timer();
+                                    MyTimerTask myTimerTask = new MyTimerTask();
+                                    mTimer.schedule(myTimerTask, 100 * 4);
+                                }
+                            });
+
+                        }
                     }
                 }
 
@@ -744,13 +772,13 @@ public class GameView extends SurfaceView {
                     }
                     if (y < 645) {
                         //ожидание
-                        if(showRoundPlayer.size()>3)
-                        showRoundPlayer.add(3, showRoundPlayer.get(0));
+                        if (showRoundPlayer.size() > 3)
+                            showRoundPlayer.add(3, showRoundPlayer.get(0));
                         else
-                        showRoundPlayer.add(showRoundPlayer.get(0));
+                            showRoundPlayer.add(showRoundPlayer.get(0));
                         playerIsAttack = false;
                         playerWhoDefence = -1;
-                        numberDraw=-1;
+                        numberDraw = -1;
                         Timer mTimer = new Timer();
                         MyTimerTask myTimerTask = new MyTimerTask();
                         mTimer.schedule(myTimerTask, 10 * 8);
@@ -761,13 +789,13 @@ public class GameView extends SurfaceView {
                     if (isWhoPlay() == 0)
                         spritesPlayer.get(isWhoGo()).changeDefence(true);
                     else spritesBot.get(isWhoGo()).changeDefence(true);
-                    if(showRoundPlayer.size()>7)
-                    showRoundPlayer.add(7, showRoundPlayer.get(0));
+                    if (showRoundPlayer.size() > 7)
+                        showRoundPlayer.add(7, showRoundPlayer.get(0));
                     else
-                    showRoundPlayer.add(showRoundPlayer.get(0));
+                        showRoundPlayer.add(showRoundPlayer.get(0));
                     playerIsAttack = false;
                     playerWhoDefence = -1;
-                    numberDraw=-1;
+                    numberDraw = -1;
                     Timer mTimer = new Timer();
                     MyTimerTask myTimerTask = new MyTimerTask();
                     mTimer.schedule(myTimerTask, 10 * 8);
@@ -799,16 +827,29 @@ public class GameView extends SurfaceView {
     //ход моба
     private void doAlg() {
 
-        GeneticAlg ge = new GeneticAlg(spritesPlayer.size() + spritesBot.size()-1,spritesPlayer, spritesBot, showRoundPlayer);
+        GeneticAlg ge = new GeneticAlg(spritesPlayer.size() + spritesBot.size() - 1, spritesPlayer, spritesBot, showRoundPlayer);
         int[] better = ge.run();
         xForAlg = null;
         yForAlg = null;
         if (System.currentTimeMillis() - old > 10000 && isWhoGo() != 0 && isWhoGo() != 3) {
             Random random = new Random();
-            better[0] = random.nextInt(3) + 14;
+            better[0] = -1;
+            for (int i = 0; i < spritesPlayer.size(); i++) {
+                if (!spritesPlayer.get(i).getDead()) {
+                    int isoX = (int) spritesPlayer.get(i).getX();
+                    int isoY = (int) spritesPlayer.get(i).getY();
+                    if (isGo(isoX, isoY)) {
+                        better[0] = i;
+                        break;
+                    }
+                }
+
+
+            }
+            if (better[0] == -1)
+                better[0] = random.nextInt(3) + 14;
             old = 0;
         }
-
         if (better[0] < spritesPlayer.size()) {//удар
 
             if (((int) spritesPlayer.get(better[0]).getX() > (int) spritesBot.get(isWhoGo()).getX() - spritesBot.get(isWhoGo()).getStep() &&
@@ -816,12 +857,13 @@ public class GameView extends SurfaceView {
                     isShot() == true)
                 if (!spritesPlayer.get(better[0]).getDead()) {
                     if (isShot()) {
-                        Bitmap bmp = BitmapFactory.decodeResource(getResources(), R.drawable.f);
-                        tiles.get((int) spritesPlayer.get(better[0]).getY() * 12 + (int) spritesPlayer.get(better[0]).getX()).changeWayPoint(bmp);
                         spritesEffect.add(createEffect(R.drawable.fire, (int) spritesPlayer.get(better[0]).getX(), (int) spritesPlayer.get(better[0]).getY()));
 
                     }
                     whoDefence = better[0];
+                    Bitmap bmp = BitmapFactory.decodeResource(getResources(), R.drawable.f);
+                    tiles.get((int) spritesPlayer.get(better[0]).getY() * 12 + (int) spritesPlayer.get(better[0]).getX()).changeWayPoint(bmp);
+
                     doMotion((int) spritesPlayer.get(better[0]).getX(), (int) spritesPlayer.get(better[0]).getY(), 1);
                     return;
 
@@ -839,20 +881,20 @@ public class GameView extends SurfaceView {
                 if (isWhoPlay() == 0)
                     spritesPlayer.get(isWhoGo()).changeDefence(true);
                 else spritesBot.get(isWhoGo()).changeDefence(true);
-                if(showRoundPlayer.size()>7)
-                showRoundPlayer.add(7, showRoundPlayer.get(0));
+                if (showRoundPlayer.size() > 7)
+                    showRoundPlayer.add(7, showRoundPlayer.get(0));
                 else
-                showRoundPlayer.add((showRoundPlayer.get(0)));
+                    showRoundPlayer.add((showRoundPlayer.get(0)));
                 Timer mTimer = new Timer();
                 MyTimerTask myTimerTask = new MyTimerTask();
                 mTimer.schedule(myTimerTask, 10 * 50);
                 return;
             }
             if (better[0] == spritesBot.size() + spritesPlayer.size()) {//ожидание
-                if(showRoundPlayer.size()>3)
-                showRoundPlayer.add(3, showRoundPlayer.get(0));
+                if (showRoundPlayer.size() > 3)
+                    showRoundPlayer.add(3, showRoundPlayer.get(0));
                 else
-                showRoundPlayer.add((showRoundPlayer.get(0)));
+                    showRoundPlayer.add((showRoundPlayer.get(0)));
                 Timer mTimer = new Timer();
                 MyTimerTask myTimerTask = new MyTimerTask();
                 mTimer.schedule(myTimerTask, 50 * 100);
@@ -927,199 +969,6 @@ public class GameView extends SurfaceView {
 
     }
 
-/*
-    //фитнесс-функция
-    protected int getDamage(int i, int whoDef, int[] remarks) {
-
-        int damage, whoGoAlg, whoPlayAlg;
-        boolean defance = false;
-        int flag = showRoundPlayer.get(i).getSizeInList();
-        if (flag - spritesBot.size() < 0)
-            whoPlayAlg = 1;
-        else whoPlayAlg = 0;
-        whoGoAlg = flag - ((flag - 6 < 0) ? 0 : 6);
-        if (whoPlayAlg == 0 && whoDef < spritesPlayer.size() || whoPlayAlg == 1 && whoDef >= spritesPlayer.size() && whoDef < spritesPlayer.size() + spritesBot.size())
-            return 0;
-        for (int j = 0; j < i; j++) {
-            if (remarks[j] == 30) {
-                flag = showRoundPlayer.get(j).getSizeInList();
-                if (flag - 6 < 0 && whoPlayAlg == 0)
-                    //бот защищается
-                    if (whoDef == flag - ((flag - 6 < 0) ? 0 : 6))
-                        defance = true;
-                if (flag - 6 > 0 && whoPlayAlg == 1) {
-                    //игрок защищается
-                    if (whoDef == flag - ((flag - 6 < 0) ? 0 : 6))
-                        defance = true;
-                }
-            }
-
-
-        }
-        int shot = 0 + ((whoPlayAlg == 0 && whoGoAlg == 3 || whoPlayAlg == 1 && (whoGoAlg == 0 || whoGoAlg == 3)) ? 1 : 0);
-        if (shot == 1) {
-            //тк стрелок - можем стерять в любого
-            if (whoPlayAlg == 0) {
-
-                damage = spritesPlayer.get(whoGoAlg).getAttack((int) xForAlg[whoDef], (int) yForAlg[whoDef],
-                        (int) (spritesBot.get(whoDef - spritesPlayer.size()).getDefence() * ((defance == true) ? 1.3 : 1)), shot);
-                return -damage;
-
-            } else {
-
-                damage = spritesBot.get(whoGoAlg).getAttack((int) xForAlg[whoDef], (int) yForAlg[whoDef],
-                        (int) (spritesPlayer.get(whoDef).getDefence() * ((defance == true) ? 1.3 : 1)), shot);
-                return damage;
-            }
-        } else
-        //проверка на возможность нападения
-        {
-            if (whoPlayAlg == 0) {
-                //если возможен удар по клеткам
-                if (xForAlg[whoDef] > xForAlg[whoGoAlg] - spritesPlayer.get(whoGoAlg).getStep() && xForAlg[whoDef] < xForAlg[whoGoAlg] + spritesPlayer.get(whoGoAlg).getStep() &&
-                        yForAlg[whoDef] > yForAlg[whoGoAlg] - spritesPlayer.get(whoGoAlg).getStep() && yForAlg[whoDef] < yForAlg[whoGoAlg] + spritesPlayer.get(whoGoAlg).getStep()) {
-                    damage = spritesPlayer.get(whoGoAlg).getAttack((int) spritesBot.get(whoDef - spritesPlayer.size()).getX(), (int) spritesBot.get(whoDef - spritesPlayer.size()).getY(),
-                            (int) (spritesBot.get(whoDef - spritesPlayer.size()).getDefence() * ((defance == true) ? 1.3 : 1)), shot);
-                    return -damage;
-                } else return 0;
-            } else {
-                //если возможен удар по клеткам
-                if (xForAlg[whoDef] > xForAlg[whoGoAlg + spritesPlayer.size() - 1] - spritesBot.get(whoGoAlg).getStep() && xForAlg[whoDef] < xForAlg[whoGoAlg + spritesPlayer.size() - 1] + spritesBot.get(whoGoAlg).getStep() &&
-                        yForAlg[whoDef] > yForAlg[whoGoAlg + spritesPlayer.size() - 1] - spritesBot.get(whoGoAlg).getStep() && yForAlg[whoDef] < yForAlg[whoGoAlg + spritesPlayer.size() - 1] + spritesBot.get(whoGoAlg).getStep()) {
-                    damage = spritesBot.get(whoGoAlg).getAttack((int) spritesPlayer.get(whoDef).getX(), (int) spritesPlayer.get(whoDef).getY(),
-                            (int) (spritesPlayer.get(whoDef).getDefence() * ((defance == true) ? 1.3 : 1)), shot);
-                    return damage;
-                } else return 0;
-
-            }
-
-
-        }
-    }
-
-    //фитнесс-функция
-    protected void setXY() {
-        xForAlg = new double[spritesBot.size() + spritesPlayer.size()];
-        yForAlg = new double[spritesBot.size() + spritesPlayer.size()];
-        int i = 0;
-        for (Sprite sprite : spritesPlayer) {
-            if (!sprite.getDead()) {
-                xForAlg[i] = sprite.getX();
-                yForAlg[i] = sprite.getY();
-            }
-            i++;
-        }
-        for (Sprite sprite : spritesBot) {
-            if (!sprite.getDead()) {
-                xForAlg[i] = sprite.getX();
-                yForAlg[i] = sprite.getY();
-            }
-            i++;
-        }
-
-    }
-
-    //фитнесс-функция
-    protected void changeXY(int i, int flag) {
-        int whoGoAlg, whoPlayAlg;
-        int fl = showRoundPlayer.get(i).getSizeInList();
-        if (fl - 6 < 0)
-            whoPlayAlg = 1;
-        else whoPlayAlg = 0;
-        whoGoAlg = fl - ((fl - 6 < 0) ? 0 : 6);
-        int j = 1;
-        switch (flag) {
-            case 14: {
-                //право вверх
-                if (whoPlayAlg == 0) {
-                    while (j < spritesPlayer.get(whoGoAlg).getStep() + 1) {
-                        if (tileIsPossible((int) xForAlg[whoGoAlg] + 1, (int) yForAlg[whoGoAlg]))
-                            xForAlg[whoGoAlg] += 1;
-                        if (tileIsPossible((int) xForAlg[whoGoAlg], (int) yForAlg[whoGoAlg] + 1))
-                            yForAlg[whoGoAlg] += 1;
-                        j++;
-                    }
-
-                } else {
-                    while (j < spritesBot.get(whoGoAlg).getStep() + 1) {
-                        if (tileIsPossible((int) xForAlg[whoGoAlg + spritesPlayer.size()] + 1, (int) yForAlg[whoGoAlg + spritesPlayer.size()]))
-                            xForAlg[whoGoAlg + spritesPlayer.size()] += 1;
-                        if (tileIsPossible((int) xForAlg[whoGoAlg + spritesPlayer.size()], (int) yForAlg[whoGoAlg + spritesPlayer.size()] + 1))
-                            yForAlg[whoGoAlg + spritesPlayer.size()] += 1;
-                        j++;
-                    }
-                }
-                break;
-            }
-            case 15: {
-                //лево вверх
-                if (whoPlayAlg == 0) {
-                    while (j < spritesPlayer.get(whoGoAlg).getStep() + 1) {
-                        if (tileIsPossible((int) xForAlg[whoGoAlg] - 1, (int) yForAlg[whoGoAlg]))
-                            xForAlg[whoGoAlg] -= 1;
-                        if (tileIsPossible((int) xForAlg[whoGoAlg], (int) yForAlg[whoGoAlg] + 1))
-                            yForAlg[whoGoAlg] += 1;
-                        j++;
-                    }
-
-                } else {
-                    while (j < spritesBot.get(whoGoAlg).getStep() + 1) {
-                        if (tileIsPossible((int) xForAlg[whoGoAlg + spritesPlayer.size()] - 1, (int) yForAlg[whoGoAlg + spritesPlayer.size()]))
-                            xForAlg[whoGoAlg + spritesPlayer.size()] -= 1;
-                        if (tileIsPossible((int) xForAlg[whoGoAlg + spritesPlayer.size()], (int) yForAlg[whoGoAlg + spritesPlayer.size()] + 1))
-                            yForAlg[whoGoAlg + spritesPlayer.size()] += 1;
-                        j++;
-                    }
-                }
-                break;
-            }
-            case 16: {
-                //право вниз
-                if (whoPlayAlg == 0) {
-                    while (j < spritesPlayer.get(whoGoAlg).getStep() + 1) {
-                        if (tileIsPossible((int) xForAlg[whoGoAlg] + 1, (int) yForAlg[whoGoAlg]))
-                            xForAlg[whoGoAlg] += 1;
-                        if (tileIsPossible((int) xForAlg[whoGoAlg], (int) yForAlg[whoGoAlg] - 1))
-                            yForAlg[whoGoAlg] -= 1;
-                        j++;
-                    }
-
-                } else {
-                    while (j < spritesBot.get(whoGoAlg).getStep() + 1) {
-                        if (tileIsPossible((int) xForAlg[whoGoAlg + spritesPlayer.size()] + 1, (int) yForAlg[whoGoAlg + spritesPlayer.size()]))
-                            xForAlg[whoGoAlg + spritesPlayer.size()] += 1;
-                        if (tileIsPossible((int) xForAlg[whoGoAlg + spritesPlayer.size()], (int) yForAlg[whoGoAlg + spritesPlayer.size()] - 1))
-                            yForAlg[whoGoAlg + spritesPlayer.size()] -= 1;
-                        j++;
-                    }
-                }
-                break;
-            }
-            case 17: {
-                //влево вниз
-                if (whoPlayAlg == 0) {
-                    while (j < spritesPlayer.get(whoGoAlg).getStep() + 1) {
-                        if (tileIsPossible((int) xForAlg[whoGoAlg] - 1, (int) yForAlg[whoGoAlg]))
-                            xForAlg[whoGoAlg] -= 1;
-                        if (tileIsPossible((int) xForAlg[whoGoAlg], (int) yForAlg[whoGoAlg] - 1))
-                            yForAlg[whoGoAlg] -= 1;
-                        j++;
-                    }
-
-                } else {
-                    while (j < spritesBot.get(whoGoAlg).getStep() + 1) {
-                        if (tileIsPossible((int) xForAlg[whoGoAlg + spritesPlayer.size()] - 1, (int) yForAlg[whoGoAlg + spritesPlayer.size()]))
-                            xForAlg[whoGoAlg + spritesPlayer.size()] -= 1;
-                        if (tileIsPossible((int) xForAlg[whoGoAlg + spritesPlayer.size()], (int) yForAlg[whoGoAlg + spritesPlayer.size()] - 1))
-                            yForAlg[whoGoAlg + spritesPlayer.size()] -= 1;
-                        j++;
-                    }
-                }
-                break;
-            }
-
-        }
-    }*/
 
     //движение бота
     private void doMotion(int isoX, int isoY, int isAttack) {
@@ -1137,17 +986,18 @@ public class GameView extends SurfaceView {
                 y = spritesBot.get(whoGo).getY();
             }
             //если удар, то отходим на шаг назад
-            if (isAttack == 1)
-                isoX = isoX + 1;
+            if (isAttack == 1) {
+                if (tileIsPossible(isoX + 1, isoY))
+                    isoX = isoX + 1;
+                else
+                    isoY = isoY - 1;
+            }
             MapWay mapPath = makePath((int) x, (int) y, isoX, isoY);
 
-
-            //   if (isWhoPlay() == 0)
-            //      spritesPlayer.get(whoGo).mapway = mapPath;
-            //   else
             spritesBot.get(whoGo).mapway = mapPath;
             if (isAttack == 1) {
-                doAttack(shot);
+                ATTACK = true;
+                //   doAttack(shot);
 
             }
 
@@ -1174,6 +1024,30 @@ public class GameView extends SurfaceView {
 
         }
 
+
+    }
+
+    private int isFinish() {
+        int flagDead = 0;
+        for (int i = 0; i < spritesBot.size(); i++) {
+            if (spritesBot.get(i).getDead())
+                flagDead++;
+        }
+        if (flagDead == 6) {
+
+            FINISH = true;
+            return 1;
+        } else flagDead = 0;
+        for (int i = 0; i < spritesPlayer.size(); i++) {
+            if (spritesPlayer.get(i).getDead())
+                flagDead++;
+        }
+        if (flagDead == 6) {
+            FINISH = true;
+            return 0;
+
+        }
+        return -1;
 
     }
 

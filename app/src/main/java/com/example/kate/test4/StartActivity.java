@@ -47,7 +47,8 @@ public class StartActivity extends Activity implements View.OnClickListener {
         Message msg = new Message();
         msg.what = STOPSPLASH;
         splashHandler.sendMessageDelayed(msg, SPLASHTIME);
-      //  startService(new Intent(this, MyService.class));
+        //музыка
+        startService(new Intent(this, MyService.class));
 
     }
 
