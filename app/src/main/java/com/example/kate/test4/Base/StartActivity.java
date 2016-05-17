@@ -1,5 +1,5 @@
 
-package com.example.kate.test4;
+package com.example.kate.test4.Base;
 
 
 import android.app.Activity;
@@ -16,6 +16,10 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
+
+import com.example.kate.test4.Base.GameView;
+import com.example.kate.test4.Base.MyService;
+import com.example.kate.test4.R;
 
 /**
  * Created by Kate on 19.04.2016.

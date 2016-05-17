@@ -1,6 +1,10 @@
-package com.example.kate.test4;
+package com.example.kate.test4.Map;
 
 import android.graphics.Point;
+
+import com.example.kate.test4.IMapCheckPoint;
+import com.example.kate.test4.MapWay;
+import com.example.kate.test4.WayPoint;
 
 import java.util.ArrayList;
 import java.util.List;

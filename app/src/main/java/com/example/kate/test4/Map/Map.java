@@ -1,8 +1,11 @@
-package com.example.kate.test4;
+package com.example.kate.test4.Map;
 
 
 import android.content.Context;
 import android.content.res.AssetManager;
+
+import com.example.kate.test4.R;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;

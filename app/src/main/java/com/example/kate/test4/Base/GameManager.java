@@ -1,7 +1,8 @@
-package com.example.kate.test4;
+package com.example.kate.test4.Base;
 
-import android.content.Context;
 import android.graphics.Canvas;
+
+import com.example.kate.test4.Base.GameView;
 
 public class GameManager extends Thread {
     /**

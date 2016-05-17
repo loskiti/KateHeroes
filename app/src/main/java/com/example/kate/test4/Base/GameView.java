@@ -1,4 +1,4 @@
-package com.example.kate.test4;
+package com.example.kate.test4.Base;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -11,9 +11,13 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.widget.Toast;
 
+import com.example.kate.test4.*;
+import com.example.kate.test4.Grafic.Effect;
+
 import java.util.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 
 public class GameView extends SurfaceView {
@@ -29,7 +33,7 @@ public class GameView extends SurfaceView {
     private List<Tile> tiles = new ArrayList<Tile>();
     private int whoGo = 0;
     private int whoDefence;
-    private Map map;
+    private com.example.kate.test4.Map map;
     private boolean ATTACK = false;
     //ограничение по кол-ву кликов
     private long lastClick;
@@ -52,7 +56,7 @@ public class GameView extends SurfaceView {
         super(context);
         gameLoopThread = new GameManager(this);
         holder = getHolder();
-        map = new Map(context);
+        map = new com.example.kate.test4.Map(context);
           /*Рисуем все наши объекты и все все все*/
         holder.addCallback(new SurfaceHolder.Callback() {
             /*** Уничтожение области рисования */

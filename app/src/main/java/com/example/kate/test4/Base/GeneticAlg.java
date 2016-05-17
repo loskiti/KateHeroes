@@ -1,5 +1,8 @@
-package com.example.kate.test4;
+package com.example.kate.test4.Base;
 
+
+import com.example.kate.test4.Grafic.ATB;
+import com.example.kate.test4.Grafic.Sprite;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,4 +1,4 @@
-package com.example.kate.test4;
+package com.example.kate.test4.Map;
 //точка пути
 
 final public class WayPoint {

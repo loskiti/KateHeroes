@@ -1,9 +1,11 @@
-package com.example.kate.test4;
+package com.example.kate.test4.Base;
 
 import android.app.Service;
 import android.content.Intent;
 import android.media.MediaPlayer;
 import android.os.IBinder;
+
+import com.example.kate.test4.R;
 
 //музыка
 public class MyService extends Service {

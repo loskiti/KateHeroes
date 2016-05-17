@@ -1,7 +1,9 @@
-package com.example.kate.test4;
+package com.example.kate.test4.Grafic;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+
+import com.example.kate.test4.Base.GameView;
 
 
 /**

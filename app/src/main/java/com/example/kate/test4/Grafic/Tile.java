@@ -1,11 +1,12 @@
-package com.example.kate.test4;
+package com.example.kate.test4.Grafic;
 
 
 import android.graphics.Bitmap;
 
 import android.graphics.Canvas;
 
-import java.nio.channels.DatagramChannel;
+import com.example.kate.test4.Base.GameView;
+import com.example.kate.test4.R;
 
 
 public class Tile {

@@ -1,4 +1,4 @@
-package com.example.kate.test4;
+package com.example.kate.test4.Map;
 
 
 import android.graphics.Point;

@@ -1,19 +1,14 @@
-package com.example.kate.test4;
+package com.example.kate.test4.Grafic;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Point;
 import android.graphics.Rect;
-import android.view.Gravity;
-import android.view.SurfaceView;
-import android.widget.ImageView;
-import android.widget.TextView;
-import android.widget.Toast;
 
-import java.io.File;
-import java.io.InputStream;
+import com.example.kate.test4.Base.GameView;
+import com.example.kate.test4.Map.MapWay;
+
 import java.util.Random;
 
 public class Sprite {
