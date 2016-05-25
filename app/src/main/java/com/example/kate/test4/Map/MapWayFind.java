@@ -2,17 +2,12 @@ package com.example.kate.test4.Map;
 
 import android.graphics.Point;
 
-import com.example.kate.test4.IMapCheckPoint;
-import com.example.kate.test4.MapWay;
-import com.example.kate.test4.WayPoint;
-
 import java.util.ArrayList;
 import java.util.List;
 
 public class MapWayFind {
     private MapWay mapway;
     private IMapCheckPoint checkPoint;
-    private boolean isFinish;
     private List<WayPoint> nextPoint;
     private List<WayPoint> backPoint;
 
@@ -25,12 +20,12 @@ public class MapWayFind {
     }
 
     public boolean findWay(int startx, int starty, int endx, int endy) {
-        isFinish = false;
+        boolean isFinish = false;
         mapway = new MapWay();
-        nextPoint = new ArrayList<WayPoint>();
-        backPoint = new ArrayList<WayPoint>();
+        nextPoint = new ArrayList<>();
+        backPoint = new ArrayList<>();
 
-        WayPoint p = new WayPoint(startx, starty, -1, -1, Math.abs(startx - endx) + Math.abs(starty - endy), true);
+        WayPoint p = new WayPoint(startx, starty, -1, -1, Math.abs(startx - endx) + Math.abs(starty - endy));
         nextPoint.add(p);
         backPoint.add(p);
         WayPoint node;
@@ -44,7 +39,6 @@ public class MapWayFind {
 
                 break;
             } else {
-                node.setVisited(true);
                 addNode(node, node.getX() + 1, node.getY(), endx, endy);
                 addNode(node, node.getX() - 1, node.getY(), endx, endy);
                 addNode(node, node.getX(), node.getY() + 1, endx, endy);
@@ -75,7 +69,7 @@ public class MapWayFind {
     private void addNode(WayPoint node, int x, int y, int endx, int endy) {
         if (checkPoint.check(x, y)) {
             int cost = Math.abs(x - endx) + Math.abs(y - endy);
-            WayPoint px = new WayPoint(x, y, node.getX(), node.getY(), cost, false);
+            WayPoint px = new WayPoint(x, y, node.getX(), node.getY(), cost);
             WayPoint old = null;
             for (WayPoint p : backPoint) {
                 if (p.getX() == px.getX() && p.getY() == px.getY()) {
@@ -86,7 +80,7 @@ public class MapWayFind {
 
             if (old == null || old.getCost() > cost) {
                 backPoint.add(px);
-                int i = 0;
+                int i;
                 for (i = 0; i < nextPoint.size(); i++) {
                     if (cost < nextPoint.get(i).getCost()) {
                         nextPoint.add(i, px);

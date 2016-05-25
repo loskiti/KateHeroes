@@ -9,13 +9,7 @@ import com.example.kate.test4.R;
 
 //музыка
 public class MyService extends Service {
-    public MyService() {
-
-    }
-
-    private static final String TAG = "MyService";
     MediaPlayer player;
-
 
     @Override
     public void onCreate() {
@@ -29,6 +23,7 @@ public class MyService extends Service {
     }
 
 
+    @Override
     public void onStart(Intent intent, int startid) {
         player.start();
     }

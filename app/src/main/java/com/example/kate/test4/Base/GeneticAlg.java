@@ -8,20 +8,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-/**
- * Created by Kate on 01.05.2016.
- */
 public class GeneticAlg {
-    private List<Sprite> spritesPlayer = new ArrayList<Sprite>();
-    private List<Sprite> spritesBot = new ArrayList<Sprite>();
-    private List<ATB> showRoundPlayer = new ArrayList<ATB>();
-   // private ApplicationTest gameView;
+    private List<Sprite> spritesPlayer = new ArrayList<>();
+    private List<Sprite> spritesBot = new ArrayList<>();
+    private List<ATB> showRoundPlayer = new ArrayList<>();
+    //фитнесс-функция, изменение координат игрока/бота
     private double[] xForAlg;
     private double[] yForAlg;
     //число хромосом в поколении
     private int hromosomLength;
     //число поколений
-    private int populationLength = 10;
+    private int populationLength;
     //кол-во генов в хромосоме
     private int genomLength = 7;
     private double mutationPercent;
@@ -44,17 +41,15 @@ public class GeneticAlg {
         SHIFT_FOR_DIVISION = shiftForDivision;
     }
 
-    public GeneticAlg( int persForDamageLength,List spritesPlayer, List spritesBot, List showRoundPlayer) {
-        //this.gameView = applicationTest;
+    public GeneticAlg( List spritesPlayer, List spritesBot, List showRoundPlayer) {
         this.hromosomLength = 10;
         this.spritesBot=spritesBot;
         this.spritesPlayer=spritesPlayer;
         this.showRoundPlayer=showRoundPlayer;
         //кол-во врагов + защита+ожидание+ход в 4 стороны
-        this.persForDamageLength = persForDamageLength + 2 + 4;
+        this.persForDamageLength = spritesBot.size()+spritesPlayer.size() + 2 + 4;
         this.mutationPercent = this.genomLength * (1.5 - Math.pow((1 - 10 * Math.pow((1 / 2), (this.genomLength - 1))), (1 / this.genomLength)));
-
-
+        populationLength = 10;
     }
 
     public int[] run() {
@@ -102,8 +97,8 @@ public class GeneticAlg {
 
     private int[] generateGenom() {
         int[] result = new int[genomLength];
+        Random random = new Random();
         for (int i = 0; i < genomLength; i++) {
-            Random random = new Random();
             result[i] = random.nextInt(persForDamageLength - 1);
         }
         return result;
@@ -111,8 +106,8 @@ public class GeneticAlg {
 
     private void selection() {
         //метод турнира
+        Random random = new Random();
         for (int i = 0; i < hromosomLength; i++) {
-            Random random = new Random();
             int index1 = random.nextInt(hromosomLength - 1);
             int index2 = random.nextInt(hromosomLength - 1);
             int fr1 = getFitnessFunctionResult(index1);
@@ -180,31 +175,14 @@ public class GeneticAlg {
         remarks = new int[genom.length];
         setXY();
         for (int i = 0; i < genom.length; i++) {
+            Random random = new Random();
+            int flag = random.nextInt(persForDamageLength - 1);
             //если до этого было нажато ожидание и персонаж играет 2 раз
-            if (remarks[i] == 1) {
-                Random random = new Random();
-                int flag = random.nextInt(persForDamageLength - 1);
+            if (remarks[i] == 1)
                 if (flag < persForDamageLength - 2 - 4) {
                     damage = damage + getDamage(i - 3, flag, remarks);
-
-
-                } else { //ожидание
-                    if (genom[i] == persForDamageLength - 2 - 4) {
-                        if (i + 3 < genomLength)
-                            remarks[i + 3] = 1;
-                        continue;
-                    }
-                    if (genom[i] == persForDamageLength - 1 - 4) {
-                        //защита
-                        remarks[i] = 30;
-                    } else {
-                        changeXY(i, genom[i]);
-                    }
-
+                    continue;
                 }
-                continue;
-            }
-
             if (genom[i] < persForDamageLength - 2 - 4) {
 
                 damage = damage + getDamage(i, genom[i], remarks);
@@ -222,7 +200,6 @@ public class GeneticAlg {
                     changeXY(i, genom[i]);
                 }
 
-
             }
 
         }
@@ -239,6 +216,7 @@ public class GeneticAlg {
             whoPlayAlg = 1;
         else whoPlayAlg = 0;
         whoGoAlg = flag - ((flag - 6 < 0) ? 0 : 6);
+        assert (whoGoAlg<6);
         if (whoPlayAlg == 0 && whoDef < spritesPlayer.size() || whoPlayAlg == 1 && whoDef >= spritesPlayer.size() && whoDef < spritesPlayer.size() + spritesBot.size())
             return 0;
         for (int j = 0; j < i; j++) {
@@ -257,19 +235,21 @@ public class GeneticAlg {
 
 
         }
-        int shot = 0 + ((whoPlayAlg == 0 && whoGoAlg == 3 || whoPlayAlg == 1 && (whoGoAlg == 0 || whoGoAlg == 3)) ? 1 : 0);
+        int shot = ((whoPlayAlg == 0 && whoGoAlg == 3 || whoPlayAlg == 1 && (whoGoAlg == 0 || whoGoAlg == 3)) ? 1 : 0);
         if (shot == 1) {
             //тк стрелок - можем стерять в любого
             if (whoPlayAlg == 0) {
 
                 damage = spritesPlayer.get(whoGoAlg).getAttack((int) xForAlg[whoDef], (int) yForAlg[whoDef],
-                        (int) (spritesBot.get(whoDef - spritesPlayer.size()).getDefence() * ((defance == true) ? 1.3 : 1)), shot);
+                        (int) (spritesBot.get(whoDef - spritesPlayer.size()).getDefence() * ((defance) ? 1.3 : 1)), shot);
+                assert (damage>0);
                 return -damage;
 
             } else {
 
                 damage = spritesBot.get(whoGoAlg).getAttack((int) xForAlg[whoDef], (int) yForAlg[whoDef],
-                        (int) (spritesPlayer.get(whoDef).getDefence() * ((defance == true) ? 1.3 : 1)), shot);
+                        (int) (spritesPlayer.get(whoDef).getDefence() * ((defance) ? 1.3 : 1)), shot);
+                assert (damage>0);
                 return damage;
             }
         } else
@@ -280,7 +260,8 @@ public class GeneticAlg {
                 if (xForAlg[whoDef] > xForAlg[whoGoAlg] - spritesPlayer.get(whoGoAlg).getStep() && xForAlg[whoDef] < xForAlg[whoGoAlg] + spritesPlayer.get(whoGoAlg).getStep() &&
                         yForAlg[whoDef] > yForAlg[whoGoAlg] - spritesPlayer.get(whoGoAlg).getStep() && yForAlg[whoDef] < yForAlg[whoGoAlg] + spritesPlayer.get(whoGoAlg).getStep()) {
                     damage = spritesPlayer.get(whoGoAlg).getAttack((int) spritesBot.get(whoDef - spritesPlayer.size()).getX(), (int) spritesBot.get(whoDef - spritesPlayer.size()).getY(),
-                            (int) (spritesBot.get(whoDef - spritesPlayer.size()).getDefence() * ((defance == true) ? 1.3 : 1)), shot);
+                            (int) (spritesBot.get(whoDef - spritesPlayer.size()).getDefence() * ((defance) ? 1.3 : 1)), shot);
+                    assert (damage>0);
                     return -damage;
                 } else return 0;
             } else {
@@ -288,7 +269,8 @@ public class GeneticAlg {
                 if (xForAlg[whoDef] > xForAlg[whoGoAlg + spritesPlayer.size() - 1] - spritesBot.get(whoGoAlg).getStep() && xForAlg[whoDef] < xForAlg[whoGoAlg + spritesPlayer.size() - 1] + spritesBot.get(whoGoAlg).getStep() &&
                         yForAlg[whoDef] > yForAlg[whoGoAlg + spritesPlayer.size() - 1] - spritesBot.get(whoGoAlg).getStep() && yForAlg[whoDef] < yForAlg[whoGoAlg + spritesPlayer.size() - 1] + spritesBot.get(whoGoAlg).getStep()) {
                     damage = spritesBot.get(whoGoAlg).getAttack((int) spritesPlayer.get(whoDef).getX(), (int) spritesPlayer.get(whoDef).getY(),
-                            (int) (spritesPlayer.get(whoDef).getDefence() * ((defance == true) ? 1.3 : 1)), shot);
+                            (int) (spritesPlayer.get(whoDef).getDefence() * ((defance) ? 1.3 : 1)), shot);
+                    assert (damage>0);
                     return damage;
                 } else return 0;
 
@@ -324,102 +306,57 @@ public class GeneticAlg {
     protected void changeXY(int i, int flag) {
         int whoGoAlg, whoPlayAlg;
         int fl = showRoundPlayer.get(i).getSizeInList();
+        assert (fl<spritesBot.size()+spritesPlayer.size());
         if (fl - 6 < 0)
             whoPlayAlg = 1;
         else whoPlayAlg = 0;
         whoGoAlg = fl - ((fl - 6 < 0) ? 0 : 6);
-        int j = 1;
         switch (flag) {
             case 14: {
                 //право вверх
-                if (whoPlayAlg == 0) {
-                    while (j < spritesPlayer.get(whoGoAlg).getStep() + 1) {
-                        if (tileIsPossible((int) xForAlg[whoGoAlg] + 1, (int) yForAlg[whoGoAlg]))
-                            xForAlg[whoGoAlg] += 1;
-                        if (tileIsPossible((int) xForAlg[whoGoAlg], (int) yForAlg[whoGoAlg] + 1))
-                            yForAlg[whoGoAlg] += 1;
-                        j++;
-                    }
-
-                } else {
-                    while (j < spritesBot.get(whoGoAlg).getStep() + 1) {
-                        if (tileIsPossible((int) xForAlg[whoGoAlg + spritesPlayer.size()] + 1, (int) yForAlg[whoGoAlg + spritesPlayer.size()]))
-                            xForAlg[whoGoAlg + spritesPlayer.size()] += 1;
-                        if (tileIsPossible((int) xForAlg[whoGoAlg + spritesPlayer.size()], (int) yForAlg[whoGoAlg + spritesPlayer.size()] + 1))
-                            yForAlg[whoGoAlg + spritesPlayer.size()] += 1;
-                        j++;
-                    }
-                }
+                makePath(whoPlayAlg,whoGoAlg,1,1);
                 break;
             }
             case 15: {
                 //лево вверх
-                if (whoPlayAlg == 0) {
-                    while (j < spritesPlayer.get(whoGoAlg).getStep() + 1) {
-                        if (tileIsPossible((int) xForAlg[whoGoAlg] - 1, (int) yForAlg[whoGoAlg]))
-                            xForAlg[whoGoAlg] -= 1;
-                        if (tileIsPossible((int) xForAlg[whoGoAlg], (int) yForAlg[whoGoAlg] + 1))
-                            yForAlg[whoGoAlg] += 1;
-                        j++;
-                    }
-
-                } else {
-                    while (j < spritesBot.get(whoGoAlg).getStep() + 1) {
-                        if (tileIsPossible((int) xForAlg[whoGoAlg + spritesPlayer.size()] - 1, (int) yForAlg[whoGoAlg + spritesPlayer.size()]))
-                            xForAlg[whoGoAlg + spritesPlayer.size()] -= 1;
-                        if (tileIsPossible((int) xForAlg[whoGoAlg + spritesPlayer.size()], (int) yForAlg[whoGoAlg + spritesPlayer.size()] + 1))
-                            yForAlg[whoGoAlg + spritesPlayer.size()] += 1;
-                        j++;
-                    }
-                }
+                makePath(whoPlayAlg,whoGoAlg,-1,1);
                 break;
             }
             case 16: {
                 //право вниз
-                if (whoPlayAlg == 0) {
-                    while (j < spritesPlayer.get(whoGoAlg).getStep() + 1) {
-                        if (tileIsPossible((int) xForAlg[whoGoAlg] + 1, (int) yForAlg[whoGoAlg]))
-                            xForAlg[whoGoAlg] += 1;
-                        if (tileIsPossible((int) xForAlg[whoGoAlg], (int) yForAlg[whoGoAlg] - 1))
-                            yForAlg[whoGoAlg] -= 1;
-                        j++;
-                    }
-
-                } else {
-                    while (j < spritesBot.get(whoGoAlg).getStep() + 1) {
-                        if (tileIsPossible((int) xForAlg[whoGoAlg + spritesPlayer.size()] + 1, (int) yForAlg[whoGoAlg + spritesPlayer.size()]))
-                            xForAlg[whoGoAlg + spritesPlayer.size()] += 1;
-                        if (tileIsPossible((int) xForAlg[whoGoAlg + spritesPlayer.size()], (int) yForAlg[whoGoAlg + spritesPlayer.size()] - 1))
-                            yForAlg[whoGoAlg + spritesPlayer.size()] -= 1;
-                        j++;
-                    }
-                }
+                makePath(whoPlayAlg,whoGoAlg,1,-1);
                 break;
             }
             case 17: {
                 //влево вниз
-                if (whoPlayAlg == 0) {
-                    while (j < spritesPlayer.get(whoGoAlg).getStep() + 1) {
-                        if (tileIsPossible((int) xForAlg[whoGoAlg] - 1, (int) yForAlg[whoGoAlg]))
-                            xForAlg[whoGoAlg] -= 1;
-                        if (tileIsPossible((int) xForAlg[whoGoAlg], (int) yForAlg[whoGoAlg] - 1))
-                            yForAlg[whoGoAlg] -= 1;
-                        j++;
-                    }
-
-                } else {
-                    while (j < spritesBot.get(whoGoAlg).getStep() + 1) {
-                        if (tileIsPossible((int) xForAlg[whoGoAlg + spritesPlayer.size()] - 1, (int) yForAlg[whoGoAlg + spritesPlayer.size()]))
-                            xForAlg[whoGoAlg + spritesPlayer.size()] -= 1;
-                        if (tileIsPossible((int) xForAlg[whoGoAlg + spritesPlayer.size()], (int) yForAlg[whoGoAlg + spritesPlayer.size()] - 1))
-                            yForAlg[whoGoAlg + spritesPlayer.size()] -= 1;
-                        j++;
-                    }
-                }
+                makePath(whoPlayAlg,whoGoAlg,-1,-1);
                 break;
             }
 
         }
+    }
+    private void makePath(int whoPlayAlg, int whoGoAlg, int x, int y){
+        int j=0;
+        if (whoPlayAlg == 0) {
+            while (j < spritesPlayer.get(whoGoAlg).getStep() ) {
+                if (tileIsPossible((int) xForAlg[whoGoAlg] +x, (int) yForAlg[whoGoAlg]))
+                    xForAlg[whoGoAlg] += x;
+                if (tileIsPossible((int) xForAlg[whoGoAlg], (int) yForAlg[whoGoAlg] +y))
+                    yForAlg[whoGoAlg] += y;
+                j++;
+            }
+
+        } else {
+            while (j < spritesBot.get(whoGoAlg).getStep() ) {
+                if (tileIsPossible((int) xForAlg[whoGoAlg + spritesPlayer.size()] +x, (int) yForAlg[whoGoAlg + spritesPlayer.size()]))
+                    xForAlg[whoGoAlg + spritesPlayer.size()] += x;
+                if (tileIsPossible((int) xForAlg[whoGoAlg + spritesPlayer.size()], (int) yForAlg[whoGoAlg + spritesPlayer.size()]+y))
+                    yForAlg[whoGoAlg + spritesPlayer.size()] += y;
+                j++;
+            }
+        }
+
+
     }
     //возможно ли сделать шаг
     public boolean possibleMove(int x, int y) {

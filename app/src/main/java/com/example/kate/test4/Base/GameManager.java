@@ -1,14 +1,15 @@
 package com.example.kate.test4.Base;
 
 import android.graphics.Canvas;
+import android.view.View;
 
-import com.example.kate.test4.Base.GameView;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+
 
 public class GameManager extends Thread {
-    /**
-     * отрисовка 10 кадров в сек
-     **/
-    static final long FPS = 10;
+
     private GameView view;
     private boolean running = false;
 
@@ -21,19 +22,13 @@ public class GameManager extends Thread {
         running = run;
     }
 
-    /**
-     * Действия, выполняемые в потоке
-     */
 
     @Override
     public void run() {
-        long ticksPS = 1000 / FPS;
-        long startTime;
-        long sleepTime;
+
         while (running) {
             Canvas c = null;
 
-            startTime = System.currentTimeMillis();
             try {
                 c = view.getHolder().lockCanvas();
                 synchronized (view.getHolder()) {
@@ -44,14 +39,29 @@ public class GameManager extends Thread {
                     view.getHolder().unlockCanvasAndPost(c);
                 }
             }
-            sleepTime = ticksPS - (System.currentTimeMillis() - startTime);
-            try {
-                if (sleepTime > 0)
-                    sleep(sleepTime);
-                else
-                    sleep(10);
-            } catch (Exception e) {
-            }
+
         }
     }
 }
+
+/*
+public class GameManager{
+    private View view;
+        public GameManager(final GameView view){
+            this.view=view;
+            ScheduledExecutorService service = Executors.newSingleThreadScheduledExecutor();
+            service.scheduleAtFixedRate(new Runnable() {
+                public void run() {
+                    Canvas c = null;
+                    c = view.getHolder().lockCanvas();
+                    synchronized (view.getHolder()) {
+                        view.onDraw(c);
+                    }
+                }
+
+            },
+            0, 1, TimeUnit.SECONDS);
+
+        }
+
+}*/

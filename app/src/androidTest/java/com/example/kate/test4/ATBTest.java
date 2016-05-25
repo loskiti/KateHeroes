@@ -3,6 +3,8 @@ package com.example.kate.test4;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 
+import com.example.kate.test4.Base.GameView;
+
 
 /**
  * Created by Kate on 16.04.2016.

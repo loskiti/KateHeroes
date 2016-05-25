@@ -6,6 +6,9 @@ import android.graphics.Canvas;
 import android.graphics.Point;
 import android.graphics.Rect;
 
+import com.example.kate.test4.Base.GameView;
+import com.example.kate.test4.Map.MapWay;
+
 import java.util.Random;
 
 /**

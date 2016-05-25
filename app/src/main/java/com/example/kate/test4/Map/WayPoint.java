@@ -3,20 +3,18 @@ package com.example.kate.test4.Map;
 
 final public class WayPoint {
     private int x, y, px, py, cost;
-    private boolean visited;
 
-    public WayPoint(int x, int y, int px, int py, int cost, boolean visited) {
+    public WayPoint(int x, int y, int px, int py, int cost) {
 
-        setData(x, y, px, py, cost, visited);
+        setData(x, y, px, py, cost);
     }
 
-    final private void setData(int x, int y, int px, int py, int cost, boolean visited) {
+    private void setData(int x, int y, int px, int py, int cost) {
         this.x = x;
         this.y = y;
         this.px = px;
         this.py = py;
         this.cost = cost;
-        this.visited = visited;
 
     }
 
@@ -40,7 +38,5 @@ final public class WayPoint {
         return cost;
     }
 
-    public void setVisited(boolean visited) {
-        this.visited = visited;
-    }
+
 }

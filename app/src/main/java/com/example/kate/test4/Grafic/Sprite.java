@@ -1,17 +1,13 @@
 package com.example.kate.test4.Grafic;
 
-import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Point;
 import android.graphics.Rect;
 
-import com.example.kate.test4.Base.GameView;
 import com.example.kate.test4.Map.MapWay;
 
-import java.util.Random;
-
-public class Sprite {
+public class Sprite extends UnitSprite implements OnDraw {
     /**
      * Рядов в спрайте = 4
      */
@@ -20,36 +16,10 @@ public class Sprite {
      * Колонок в спрайте = 3
      */
     private static final int BMP_COLUMNS = 3;
-    private GameView gameView;
     public MapWay mapway;
-    private Bitmap bmp;
-    private double x;
-    private double y;
-    private int minAttack;
-    private int maxAttack;
-    private int defence;
-    private int damage;
-    private int health;
-    private int step;
-    private int initiative;
-    private int morale;
-    private int outlive;
-    private int number;
-    //размеры одного тайла на поле
-    private static int h = 72;
-    private static int w = 120;
-    private boolean isBot;
-    private boolean shot;
-    private boolean dead;
-    private Context context;
-    //выводимые координаты
-    private int isoX;
-    private int isoY;
     private int xSpeed = 0;
     private int ySpeed = 0;
-    private int newDefence = defence;
-
-    // направление = 0 вверх, 1 влево, 2 вниз, 3 вправо,
+       // направление = 0 вверх, 1 влево, 2 вниз, 3 вправо,
 // анимация = 3 вверх, 1 влево, 0 вниз, 2 вправо
     int[] DIRECTION_TO_ANIMATION_MAP = {3, 1, 0, 2};
     /**
@@ -59,29 +29,12 @@ public class Sprite {
     private int width;
     private int height;
 
-    public Sprite( Bitmap bmp, double x, double y, int damage,
-                  int defence, int minAttack, int maxAttack, int health, int step, int initiative, int morale, int number, boolean isBot, boolean shot, boolean dead) {
-       // this.gameView = gameView;
-        this.bmp = bmp;
+    public Sprite( Bitmap bmp, double x, double y,
+                  int defence, int minAttack, int maxAttack, int health, int step, int initiative,  int number, boolean isBot, boolean shot, boolean dead) {
+      super(bmp,x,y,defence,minAttack,maxAttack,health,step,initiative,number,isBot,shot,dead);
         this.width = bmp.getWidth() / BMP_COLUMNS;
         this.height = bmp.getHeight() / BMP_ROWS;
-        this.x = x;
-        this.y = y;
-        this.minAttack = minAttack;
-        this.maxAttack = maxAttack;
-        this.defence = defence;
-        this.damage = damage;
-        this.health = health;
-        this.step = step;
-        this.initiative = initiative;
-        this.morale = morale;
-        this.number = number;
-        outlive = number * health;
-        this.isBot = isBot;
-       // this.context = context;
-        this.newDefence = defence;
-        this.shot = shot;
-        this.dead = dead;
+
     }
 
 
@@ -134,12 +87,14 @@ public class Sprite {
 
     }
 
-
+    @Override
     public void onDraw(Canvas canvas) {
 
         update();
-        isoX = (int) (x * w - ((y % 2 == 1) ? w / 2 : 0)) + w / 8;
-        isoY = (int) (y * (h / 2) - (h * 0.75));
+        int w = 120;
+        int isoX = (int) (x * w - ((y % 2 == 1) ? w / 2 : 0)) + w / 8;
+        int h = 72;
+        int isoY = (int) (y * (h / 2) - (h * 0.75));
         if (mapway != null) {
             if (mapway.way.size() != 0) {
                 Point point;
@@ -174,42 +129,12 @@ public class Sprite {
         double dirDouble = (Math.atan2(xSpeed, ySpeed) / (Math.PI / 2) + 2);
         int direction = (int) Math.round(dirDouble) % BMP_ROWS;
         if (ySpeed == 0 && xSpeed == 0)
-            direction = 0 + ((isBot == true) ? 1 : 3);
+            direction = ((isBot) ? 1 : 3);
         return DIRECTION_TO_ANIMATION_MAP[direction];
-    }
-
-    /**
-     * Проверка на столкновения
-     */
-    public boolean isCollision(float x2, float y2) {
-        return x2 > x && x2 < x + width && y2 > y && y2 < y + height;
-    }
-
-    public double getX() {
-        return x;
-    }
-
-    public double getY() {
-        return y;
-    }
-
-    //урон, который будет нанесен
-    public int getAttack(int oppX, int oppY, int oppDefence, int flag) {
-
-        Random random = new Random();
-
-        int att = number * (minAttack + (maxAttack - minAttack) + random.nextInt(1)) *
-                (int) (((minAttack < oppDefence) ? (1 / (1 + (oppDefence - minAttack) * 0.05)) : (1 + (minAttack - oppDefence) * 0.05)) + 1);
-
-        //если стрелок
-        if (flag != 0)
-            att = (int) (att * ((Math.abs(oppX - x) < 6 && Math.abs(oppY - y) < 6) ? 1 : 0.5));
-        return att;
     }
 
     //атака
     public int attack(int att) {
-
 
         outlive = outlive - att;
         number = outlive / health + 1;
@@ -217,43 +142,5 @@ public class Sprite {
         return number;
     }
 
-    public int getDefence() {
-        return newDefence;
-    }
-
-    public int getInit() {
-        return initiative;
-    }
-
-    public int getNumber() {
-        return number;
-    }
-
-    public int getStep() {
-        return step;
-    }
-
-    public int getHealth() {
-        return health;
-    }
-
-    public boolean getShot() {
-        return shot;
-    }
-
-    public boolean getDead() {
-        return dead;
-    }
-
-    public void setDead(boolean flag) {
-        dead = flag;
-    }
-
-    public void changeDefence(boolean flag) {
-        if (flag)
-            newDefence = (int) (defence * 1.3);
-        else
-            newDefence = defence;
-    }
 
 }

@@ -12,19 +12,16 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 
 public class Map {
-    private Context mContext;
     private int map[][];
 
     public Map(Context context) {
-
-        this.mContext = context;
 
         int n = 23, m = 12;
 
         map = new int[n][m];
 
 
-        AssetManager am = mContext.getAssets();
+        AssetManager am = context.getAssets();
 
         try {
             InputStream is = am.open("in.txt");
@@ -64,9 +61,7 @@ public class Map {
     }
 
     private boolean isTile(int x, int y) {
-        if ((x >= 0) && (y >= 0) && (y < getMapHeight()) && (x < getMapWidth()))
-            return true;
-        return false;
+        return (x >= 0) && (y >= 0) && (y < getMapHeight()) && (x < getMapWidth());
     }
 
     public int getTileName(int id) {
@@ -77,13 +72,6 @@ public class Map {
             default:
                 return (R.drawable.piskel);
         }
-    }
-
-    public int getTile(int x, int y) {
-        if (isTile(x, y))
-            return map[y][x];
-        return 0;
-
     }
 
 

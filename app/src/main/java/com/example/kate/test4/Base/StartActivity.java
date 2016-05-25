@@ -17,14 +17,8 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
 
-import com.example.kate.test4.Base.GameView;
-import com.example.kate.test4.Base.MyService;
 import com.example.kate.test4.R;
 
-/**
- * Created by Kate on 19.04.2016.
- *//*
-*/
 
 
 public class StartActivity extends Activity implements View.OnClickListener {
@@ -52,7 +46,7 @@ public class StartActivity extends Activity implements View.OnClickListener {
         msg.what = STOPSPLASH;
         splashHandler.sendMessageDelayed(msg, SPLASHTIME);
         //музыка
-        startService(new Intent(this, MyService.class));
+       // startService(new Intent(this, MyService.class));
 
     }
 
